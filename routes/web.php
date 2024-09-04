@@ -32,14 +32,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/{id}/update', [MemberController::class, 'update']);
 
     Route::get('/logout', [UserController::class, 'logout']);
-    Route::view('/register', "register")->name('register');
-
-Route::post('/validate-register', [UserController::class, 'register']);
+    
+    Route::get('/about', function () {
+        return view('about');
+    });
 });
 
 // Rotas de login e registro que não exigem autenticação
+Route::view('/register', "register")->name('register');
+Route::post('/validate-register', [UserController::class, 'register']);
 Route::view('/login', "login")->name('login');
-Route::post('/start-section', [UserController::class, 'login']);
-Route::get('/about', function () {
-    return view('about');
-});
+Route::view('/', "login");
+Route::post('/login', [UserController::class, 'login']);

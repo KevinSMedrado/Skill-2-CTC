@@ -17,25 +17,19 @@ class UserController extends Controller
         $users->password = Hash::make($request->password);
 
         $users->save();
-
-        Auth::login($users);
-
-        return redirect("/index");
+        return redirect("login");
     }
 
     public function login(Request $request)
 {
-    $credentials = [
-        "email" => $request->email,
-        "password" => $request->password,
-    ];
+    $credentials = $request->only('email','password');
 
-    if (Auth::attempt($credentials, true)) {
+    if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
 
         $user = Auth::user();
         $token = $user->createToken('LoginToken')->plainTextToken;
-        return redirect('index');
+        return redirect()->intended('index')->with('token',$token);
 
     } else {
         return redirect("login")->with('error', 'Invalid credentials');
@@ -51,6 +45,11 @@ class UserController extends Controller
     }else{
         return redirect('index')->withErrors(['User not authenticated']);
     }
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    $request->user()->tokens()->delete();
+    
     
     return redirect('login');
 }
